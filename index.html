@@ -1,2028 +1,455 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>陈浩南的每日打卡</title>
-  <style>
-    /* ===== 基础设置 ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>陈浩南的每日打卡</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f0f4f8">
+<link rel="manifest" href="manifest.json">
+<style>
+/* ===== CSS变量 ===== */
+:root{
+  --bg:#f0f4f8;--card:#fff;--text:#1a1a2e;--sub:#8e8e93;--border:#e8ecf1;
+  --green:#34c759;--red:#ff3b30;--blue:#007aff;--orange:#ff9500;
+  --shadow:0 2px 8px rgba(0,0,0,0.06);--radius:16px;
+}
+body.dark{
+  --bg:#0f1117;--card:#161a24;--text:#e0e0e0;--sub:#888;--border:#1e2230;
+  --shadow:0 2px 8px rgba(0,0,0,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:80px;transition:background 0.3s,color 0.3s}
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: #f0f4f8;
-      color: #1a1a2e;
-      /* 让整个 App 在屏幕中间，最大宽度像手机一样 */
-      max-width: 480px;
-      margin: 0 auto;
-      min-height: 100vh;
-      /* 给底部导航栏留出空间 */
-      padding-bottom: 80px;
-    }
+/* 顶部栏 */
+#top-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;z-index:100;box-shadow:var(--shadow)}
+#top-bar-title{font-size:19px;font-weight:800;color:var(--text)}
+#top-bar-right{display:flex;align-items:center;gap:8px}
+#top-bar-date{font-size:12px;color:var(--sub)}
+#theme-toggle{font-size:18px;cursor:pointer;padding:4px 8px;border-radius:8px;user-select:none;background:none;border:none}
+#theme-toggle:hover{background:var(--border)}
 
-    /* ===== 顶部标题栏 ===== */
-    #top-bar {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      background: #ffffff;
-      padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 100;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    }
-    #top-bar-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #1a1a2e;
-    }
-    #top-bar-date {
-      font-size: 13px;
-      color: #8e8e93;
-    }
-    #theme-toggle {
-      font-size: 20px;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 8px;
-      transition: all 0.2s;
-      user-select: none;
-    }
-    #theme-toggle:hover {
-      background: #f0f0f0;
-    }
+/* 页面 */
+.page{display:none;padding:76px 14px 20px;animation:fadeIn 0.25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-    /* ===== 页面容器 ===== */
-    .page {
-      display: none;
-      padding: 80px 16px 20px; /* 顶部留空给标题栏 */
-    }
-    .page.active {
-      display: block;
-    }
+/* 底部导航 */
+#bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);display:flex;justify-content:space-around;height:60px;z-index:100;box-shadow:0 -1px 4px rgba(0,0,0,0.06);border-radius:18px 18px 0 0;padding:4px 0 8px}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;padding:4px 8px;border-radius:10px;color:var(--sub);transition:all 0.2s;min-width:52px}
+.nav-item.active{color:var(--green)}
+.nav-icon{font-size:20px}.nav-label{font-size:10px;font-weight:500}
 
-    /* ===== 底部导航栏 ===== */
-    #bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      background: #ffffff;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      height: 64px;
-      z-index: 100;
-      box-shadow: 0 -1px 4px rgba(0,0,0,0.06);
-      border-radius: 20px 20px 0 0;
-    }
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      cursor: pointer;
-      padding: 6px 10px;
-      border-radius: 12px;
-      transition: all 0.2s;
-      color: #8e8e93;
-    }
-    .nav-item.active {
-      color: #34c759;
-    }
-    .nav-icon {
-      font-size: 22px;
-    }
-    .nav-label {
-      font-size: 11px;
-      font-weight: 500;
-    }
+/* 今日进度 */
+.week-summary{background:var(--card);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
+.week-ring{position:relative;width:56px;height:56px;flex-shrink:0}
+.week-ring svg{transform:rotate(-90deg)}
+.week-ring .ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:800;color:var(--green)}
+.week-info{flex:1}
+.week-info .week-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.week-info .week-detail{font-size:11px;color:var(--sub);line-height:1.5}
 
-    /* ===== 目标卡片 ===== */
-    .goal-card {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      transition: all 0.3s;
-    }
-    .goal-card.checked-in {
-      background: #f0fff4;
-      border: 2px solid #34c759;
-    }
-    .goal-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      flex-shrink: 0;
-    }
-    .goal-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .goal-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #1a1a2e;
-      margin-bottom: 4px;
-    }
-    .goal-streak {
-      font-size: 12px;
-      color: #8e8e93;
-    }
-    .goal-streak strong {
-      color: #34c759;
-    }
+/* 目标卡片 */
+.goal-list{display:flex;flex-direction:column;gap:10px}
+.goal-card{background:var(--card);border-radius:var(--radius);padding:15px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);transition:all 0.3s;border:2px solid transparent}
+.goal-card.checked-in{background:rgba(52,199,89,0.06);border-color:var(--green)}
+.goal-icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.goal-info{flex:1;min-width:0;cursor:pointer}
+.goal-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
+.goal-streak{font-size:11px;color:var(--sub)}
+.goal-streak strong{color:var(--green)}
+.goal-bar{width:100%;height:4px;border-radius:2px;background:var(--border);margin-top:6px;overflow:hidden}
+.goal-bar-fill{height:100%;border-radius:2px;background:var(--green);transition:width 0.5s ease}
 
-    /* 打卡按钮 */
-    .checkin-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 2px dashed #d0d0d0;
-      background: #ffffff;
-      font-size: 20px;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .checkin-btn:hover {
-      border-color: #34c759;
-      background: #f0fff4;
-    }
-    .checkin-btn.done {
-      background: #34c759;
-      border: none;
-      color: #ffffff;
-      cursor: default;
-    }
+.checkin-btn{width:42px;height:42px;border-radius:50%;border:2px dashed #d0d0d0;background:var(--card);font-size:18px;cursor:pointer;flex-shrink:0;transition:all 0.2s;display:flex;align-items:center;justify-content:center;color:var(--sub)}
+body.dark .checkin-btn{border-color:#444;background:var(--card)}
+.checkin-btn:hover{border-color:var(--green);background:rgba(52,199,89,0.08)}
+.checkin-btn.done{background:var(--green);border:none;color:#fff;cursor:pointer}
 
-    /* 今日进度 */
-    .today-progress {
-      text-align: center;
-      padding: 8px 0 16px;
-      font-size: 14px;
-      color: #8e8e93;
-    }
-    .today-progress strong {
-      color: #34c759;
-      font-size: 18px;
-    }
+/* 空状态 */
+.empty-state{text-align:center;padding:50px 20px;display:none}
+.empty-icon{font-size:54px;margin-bottom:12px}.empty-text{font-size:16px;font-weight:700;margin-bottom:6px}.empty-hint{font-size:12px;color:var(--sub)}
 
-    /* 空状态 */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      display: none;
-    }
-    .empty-icon {
-      font-size: 64px;
-      margin-bottom: 16px;
-    }
-    .empty-text {
-      font-size: 17px;
-      color: #1a1a2e;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .empty-hint {
-      font-size: 13px;
-      color: #8e8e93;
-    }
+/* FAB */
+.fab{position:fixed;bottom:82px;right:max(14px,calc(50vw - 226px));width:50px;height:50px;border-radius:50%;background:var(--green);color:#fff;font-size:26px;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(52,199,89,0.4);z-index:90;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.fab:active{transform:scale(0.92)}
 
-    /* ===== 浮动添加按钮 ===== */
-    .fab {
-      position: fixed;
-      bottom: 90px;
-      right: max(16px, calc(50vw - 224px));
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: #34c759;
-      color: #ffffff;
-      font-size: 28px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(52,199,89,0.4);
-      z-index: 90;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      line-height: 1;
-    }
-    .fab:hover {
-      transform: scale(1.08);
-      box-shadow: 0 6px 20px rgba(52,199,89,0.5);
-    }
-    .fab:active {
-      transform: scale(0.95);
-    }
+/* 弹窗 */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:200;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:block}
+.modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.9);width:calc(100% - 36px);max-width:400px;background:var(--card);border-radius:18px;z-index:201;box-shadow:0 20px 60px rgba(0,0,0,0.25);overflow:hidden;transition:transform 0.2s}
+.modal.show{display:block;transform:translate(-50%,-50%) scale(1)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 18px 0}
+.modal-title{font-size:17px;font-weight:700}
+.modal-close{width:30px;height:30px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--sub)}
+.modal-body{padding:14px 18px 22px}
+.input-label{display:block;font-size:12px;font-weight:600;color:var(--sub);margin-bottom:6px;margin-top:14px}
+.input-field{width:100%;padding:11px 13px;border:2px solid var(--border);border-radius:11px;font-size:14px;outline:none;font-family:inherit;background:var(--bg);color:var(--text);transition:border-color 0.2s}
+.input-field:focus{border-color:var(--green)}
+.btn{padding:11px 22px;border-radius:11px;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.btn-primary{background:var(--green);color:#fff;width:100%;margin-top:18px;padding:13px}
+.btn-primary:hover{opacity:0.9}
+.btn-danger{background:var(--card);color:var(--red);border:1px solid var(--red);width:100%;margin-top:8px;padding:10px}
+.btn-outline{background:var(--card);color:var(--text);border:2px solid var(--border);width:100%;margin-top:8px}
+.emoji-picker{display:flex;flex-wrap:wrap;gap:7px}.emoji-option{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;background:var(--bg);transition:all 0.15s}
+.emoji-option.selected{border-color:var(--green);background:rgba(52,199,89,0.1)}
+.color-picker{display:flex;gap:9px;flex-wrap:wrap}
+.color-option{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.15s}
+.color-option.selected{border-color:var(--text);transform:scale(1.12)}
 
-    /* ===== 弹窗 ===== */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.4);
-      z-index: 200;
-      backdrop-filter: blur(4px);
-    }
-    .modal-overlay.show {
-      display: block;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
-      width: calc(100% - 40px);
-      max-width: 420px;
-      background: #ffffff;
-      border-radius: 20px;
-      z-index: 201;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-      overflow: hidden;
-      transition: transform 0.2s;
-    }
-    .modal.show {
-      display: block;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 20px 0;
-    }
-    .modal-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
-    .modal-close {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #f0f0f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 14px;
-      color: #666;
-      transition: all 0.2s;
-    }
-    .modal-close:hover {
-      background: #e0e0e0;
-    }
-    .modal-body {
-      padding: 16px 20px 24px;
-    }
-    .input-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #555;
-      margin-bottom: 8px;
-      margin-top: 16px;
-    }
-    .input-field {
-      width: 100%;
-      padding: 12px 14px;
-      border: 2px solid #e8ecf1;
-      border-radius: 12px;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s;
-      font-family: inherit;
-    }
-    .input-field:focus {
-      border-color: #34c759;
-    }
-    .btn {
-      padding: 12px 24px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-    .btn-primary {
-      background: #34c759;
-      color: #ffffff;
-    }
-    .btn-primary:hover {
-      background: #2db84e;
-    }
-    .btn-full {
-      width: 100%;
-      margin-top: 20px;
-      padding: 14px;
-    }
+/* 统计页 */
+.stats-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:14px;text-align:center;box-shadow:var(--shadow)}
+.stat-card.wide{grid-column:span 2}
+.stat-num{font-size:26px;font-weight:800;color:var(--green)}.stat-label{font-size:11px;color:var(--sub);margin-top:3px}
+.stats-section{background:var(--card);border-radius:var(--radius);padding:15px;margin-bottom:12px;box-shadow:var(--shadow)}
+.stats-section-title{font-size:13px;font-weight:700;margin-bottom:12px}
 
-    /* 图标选择器 */
-    .emoji-picker {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .emoji-option {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      background: #f5f7fa;
-      transition: all 0.15s;
-    }
-    .emoji-option.selected {
-      border-color: #34c759;
-      background: #f0fff4;
-    }
+/* 热力图 */
+.heatmap{display:flex;gap:3px;overflow-x:auto;padding:4px 0}
+.heatmap-col{display:flex;flex-direction:column;gap:3px}
+.heatmap-cell{width:13px;height:13px;border-radius:2px;background:var(--border);transition:all 0.2s}
+.heatmap-cell.l1{background:rgba(52,199,89,0.25)}.heatmap-cell.l2{background:rgba(52,199,89,0.5)}.heatmap-cell.l3{background:rgba(52,199,89,0.75)}.heatmap-cell.l4{background:var(--green)}
+.heatmap-label{font-size:9px;color:var(--sub);text-align:center;margin-top:2px}
 
-    /* 颜色选择器 */
-    .color-picker {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .color-option {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 3px solid transparent;
-      transition: all 0.15s;
-    }
-    .color-option.selected {
-      border-color: #1a1a2e;
-      transform: scale(1.15);
-    }
+/* 柱状图 */
+.bar-chart{display:flex;align-items:flex-end;gap:7px;height:100px;padding:0 2px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end}
+.bar-fill{width:100%;max-width:32px;border-radius:6px 6px 0 0;background:var(--green);transition:height 0.5s ease;min-height:3px}.bar-fill.zero{background:var(--border)}
+.bar-label{font-size:9px;color:var(--sub)}
 
-    /* ===== 日历 ===== */
-    .month-switcher {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .month-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: none;
-      background: #ffffff;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      color: #1a1a2e;
-      transition: all 0.2s;
-    }
-    .month-btn:hover {
-      background: #f0f4f8;
-    }
-    .month-label {
-      font-size: 16px;
-      font-weight: 600;
-      color: #1a1a2e;
-    }
-    .weekday-row {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      text-align: center;
-      font-size: 12px;
-      color: #8e8e93;
-      margin-bottom: 8px;
-      padding: 0 4px;
-    }
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
-    }
-    .calendar-cell {
-      aspect-ratio: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 14px;
-      background: #ffffff;
-      transition: all 0.2s;
-      position: relative;
-      gap: 2px;
-    }
-    .calendar-cell:hover {
-      background: #e8f5e9;
-    }
-    .calendar-cell.empty {
-      background: transparent;
-      cursor: default;
-    }
-    .calendar-cell.today {
-      border: 2px solid #34c759;
-      font-weight: 700;
-    }
-    .calendar-cell.selected-cell {
-      background: #e8f5e9;
-      border: 2px solid #34c759;
-    }
-    .calendar-cell .day-num {
-      font-size: 14px;
-      color: #1a1a2e;
-    }
-    .calendar-cell .day-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-    }
-    .calendar-cell .day-dot.all { background: #34c759; }
-    .calendar-cell .day-dot.partial { background: #FFCC00; }
-    .calendar-cell .day-dot.none { background: #e0e0e0; }
+/* 成就 */
+.badge-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge-item{text-align:center;padding:10px 6px;border-radius:12px;background:var(--bg);transition:all 0.3s}.badge-item.unlocked{background:rgba(255,149,0,0.08)}
+.badge-item .badge-icon{font-size:28px;margin-bottom:4px}
+.badge-item.locked .badge-icon{filter:grayscale(1);opacity:0.25}
+.badge-item .badge-title{font-size:10px;font-weight:600}.badge-item.locked .badge-title{color:#bbb}
+.badge-item .badge-sub{font-size:9px;color:var(--sub);margin-top:1px}
 
-    /* 日期详情 */
-    .day-detail {
-      margin-top: 20px;
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .day-detail-title {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #1a1a2e;
-    }
-    .day-detail-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 0;
-      border-bottom: 1px solid #f0f0f0;
-      font-size: 14px;
-    }
-    .day-detail-item:last-child {
-      border-bottom: none;
-    }
-    .day-detail-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-    .day-detail-none {
-      color: #8e8e93;
-      font-size: 13px;
-      text-align: center;
-      padding: 8px 0;
-    }
+/* 日历 */
+.month-switcher{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.month-btn{width:34px;height:34px;border-radius:50%;border:none;background:var(--card);font-size:15px;cursor:pointer;box-shadow:var(--shadow);color:var(--text)}
+.month-label{font-size:15px;font-weight:700}
+.weekday-row{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;color:var(--sub);margin-bottom:6px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.calendar-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;font-size:13px;background:var(--card);transition:all 0.2s;gap:1px}.calendar-cell:hover{background:rgba(52,199,89,0.08)}
+.calendar-cell.empty{background:transparent;cursor:default}
+.calendar-cell.today{border:2px solid var(--green);font-weight:700}
+.calendar-cell.selected-cell{background:rgba(52,199,89,0.12);border:2px solid var(--green)}
+.calendar-cell .day-dot{width:5px;height:5px;border-radius:50%}
+.day-dot.all{background:var(--green)}.day-dot.partial{background:#fc0}.day-dot.none{background:var(--border)}
+.day-detail{background:var(--card);border-radius:var(--radius);padding:14px;margin-top:15px;box-shadow:var(--shadow)}
+.day-detail-title{font-size:13px;font-weight:700;margin-bottom:10px}
+.day-detail-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.day-detail-item:last-child{border-bottom:none}
+.day-detail-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.day-detail-none{color:var(--sub);font-size:12px;text-align:center;padding:6px 0}
 
-    /* ===== 备忘录 ===== */
-    .memo-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .memo-card {
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .memo-card:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .memo-card-date {
-      font-size: 12px;
-      color: #8e8e93;
-      margin-bottom: 8px;
-    }
-    .memo-card-content {
-      font-size: 14px;
-      color: #1a1a2e;
-      line-height: 1.6;
-      /* 最多显示 4 行 */
-      display: -webkit-box;
-      -webkit-line-clamp: 4;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .memo-fab {
-      background: #007AFF;
-      right: max(16px, calc(50vw - 224px));
-      box-shadow: 0 4px 16px rgba(0,122,255,0.4);
-    }
-    .memo-fab:hover {
-      box-shadow: 0 6px 20px rgba(0,122,255,0.5);
-    }
-    .memo-textarea {
-      resize: vertical;
-      font-family: inherit;
-      line-height: 1.6;
-    }
-    .btn-danger {
-      background: #ffffff;
-      color: #ff3b30;
-      border: 1px solid #ff3b30;
-      margin-top: 10px;
-    }
-    .btn-danger:hover {
-      background: #ff3b30;
-      color: #ffffff;
-    }
+/* 备忘录 */
+.memo-list{display:flex;flex-direction:column;gap:10px}.memo-fab{background:var(--blue);box-shadow:0 4px 16px rgba(0,122,255,0.4)}
+.memo-card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);cursor:pointer;transition:all 0.2s}.memo-card:hover{box-shadow:0 4px 14px rgba(0,0,0,0.1)}
+.memo-card-date{font-size:11px;color:var(--sub);margin-bottom:6px}
+.memo-card-content{font-size:13px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.memo-textarea{resize:vertical;font-family:inherit;line-height:1.6;min-height:100px}
+.btn-sm{padding:5px 10px;border-radius:7px;font-size:11px;border:none;cursor:pointer;font-family:inherit}
+.btn-sm-edit{background:var(--border);color:var(--text)}.btn-sm-delete{background:rgba(255,59,48,0.1);color:var(--red)}
 
-    /* ===== 设置页面 ===== */
-    .settings-section {
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .settings-section-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin-bottom: 14px;
-    }
-    .btn-outline {
-      background: #ffffff;
-      color: #1a1a2e;
-      border: 2px solid #e8ecf1;
-    }
-    .btn-outline:hover {
-      background: #f0f4f8;
-    }
-    .settings-goal-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .settings-goal-item:last-child {
-      border-bottom: none;
-    }
-    .settings-goal-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-    .settings-goal-title {
-      flex: 1;
-      font-size: 14px;
-      font-weight: 500;
-    }
-    .settings-goal-actions {
-      display: flex;
-      gap: 6px;
-    }
-    .btn-sm {
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s;
-    }
-    .btn-sm-edit {
-      background: #f0f4f8;
-      color: #1a1a2e;
-    }
-    .btn-sm-edit:hover {
-      background: #e0e4e8;
-    }
-    .btn-sm-delete {
-      background: #fff0f0;
-      color: #ff3b30;
-    }
-    .btn-sm-delete:hover {
-      background: #ff3b30;
-      color: #ffffff;
-    }
+/* 设置 */
+.settings-section{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.settings-section-title{font-size:14px;font-weight:700;margin-bottom:12px}
+.settings-goal-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+.settings-goal-item:last-child{border-bottom:none}
+.settings-goal-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.settings-goal-title{flex:1;font-size:13px;font-weight:500}
+.settings-goal-actions{display:flex;gap:5px}
 
-    /* ===== 庆祝动画 ===== */
-    #celebration-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 999;
-    }
-    .particle {
-      position: absolute;
-      font-size: 20px;
-      animation: particle-burst 1s ease-out forwards;
-      pointer-events: none;
-    }
-    @keyframes particle-burst {
-      0%   { transform: translate(0, 0) scale(1); opacity: 1; }
-      100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
-    }
-    @keyframes bounce-in {
-      0%   { transform: scale(1); }
-      30%  { transform: scale(1.35); }
-      60%  { transform: scale(0.85); }
-      100% { transform: scale(1); }
-    }
-    .bounce {
-      animation: bounce-in 0.4s ease;
-    }
+/* 庆祝动画 */
+#celebration-container{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:999}
+.confetti-piece{position:absolute;pointer-events:none;animation:confetti-fall var(--fall-time) ease-out forwards}
+@keyframes confetti-fall{0%{transform:translate(0,0) rotate(0deg) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(0.2);opacity:0}}
+@keyframes bounce-in{0%{transform:scale(1)}30%{transform:scale(1.4)}60%{transform:scale(0.85)}100%{transform:scale(1)}}
+.bounce{animation:bounce-in 0.4s ease}
 
-    /* ===== 五彩纸屑 ===== */
-    .confetti-piece {
-      position: absolute;
-      pointer-events: none;
-      animation: confetti-fall var(--fall-time) ease-out forwards;
-    }
-    @keyframes confetti-fall {
-      0%   { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
-      100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.3); opacity: 0; }
-    }
+/* Toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:10px 22px;border-radius:22px;font-size:13px;z-index:999;animation:toastIn 0.3s ease,toastOut 0.3s ease 1.8s forwards;pointer-events:none;white-space:nowrap}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes toastOut{from{opacity:1}to{opacity:0}}
 
-    /* ===== 统计页面 ===== */
-    .stats-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .stat-card {
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 16px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .stat-card .stat-num {
-      font-size: 28px;
-      font-weight: 800;
-      color: #34c759;
-    }
-    .stat-card .stat-label {
-      font-size: 12px;
-      color: #8e8e93;
-      margin-top: 4px;
-    }
-    .stat-card.wide {
-      grid-column: span 2;
-    }
-    .stats-section {
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .stats-section-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin-bottom: 14px;
-    }
+/* 成就弹窗 */
+#badge-modal{text-align:center;padding:28px 18px;display:none}
+#badge-modal.show{display:block;transform:translate(-50%,-50%) scale(1)}
+#badge-modal .badge-big{font-size:64px;animation:badge-pop 0.6s ease}
+@keyframes badge-pop{0%{transform:scale(0);opacity:0}50%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+#badge-modal .badge-name{font-size:18px;font-weight:700;margin-top:10px}#badge-modal .badge-desc{font-size:12px;color:var(--sub);margin-top:4px}
 
-    /* 柱状图 */
-    .bar-chart {
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
-      height: 120px;
-      padding: 0 4px;
-    }
-    .bar-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      height: 100%;
-      justify-content: flex-end;
-    }
-    .bar-fill {
-      width: 100%;
-      max-width: 36px;
-      border-radius: 8px 8px 0 0;
-      background: #34c759;
-      transition: height 0.5s ease;
-      min-height: 4px;
-    }
-    .bar-fill.zero { background: #e0e0e0; }
-    .bar-label {
-      font-size: 10px;
-      color: #8e8e93;
-    }
-
-    /* ===== 成就徽章 ===== */
-    .badge-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-    }
-    .badge-item {
-      text-align: center;
-      padding: 12px 8px;
-      border-radius: 14px;
-      background: #f5f7fa;
-      transition: all 0.3s;
-    }
-    .badge-item.unlocked {
-      background: #fff9e6;
-    }
-    .badge-item .badge-icon {
-      font-size: 32px;
-      margin-bottom: 6px;
-    }
-    .badge-item.locked .badge-icon {
-      filter: grayscale(1);
-      opacity: 0.3;
-    }
-    .badge-item .badge-title {
-      font-size: 11px;
-      font-weight: 600;
-      color: #1a1a2e;
-    }
-    .badge-item.locked .badge-title {
-      color: #ccc;
-    }
-    .badge-item .badge-sub {
-      font-size: 10px;
-      color: #8e8e93;
-      margin-top: 2px;
-    }
-
-    /* 成就解锁弹窗 */
-    #badge-modal {
-      text-align: center;
-      padding: 30px 20px;
-    }
-    #badge-modal .badge-big {
-      font-size: 72px;
-      animation: badge-pop 0.6s ease;
-    }
-    @keyframes badge-pop {
-      0%   { transform: scale(0); opacity: 0; }
-      50%  { transform: scale(1.3); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    #badge-modal .badge-name {
-      font-size: 20px;
-      font-weight: 700;
-      margin-top: 12px;
-      color: #1a1a2e;
-    }
-    #badge-modal .badge-desc {
-      font-size: 13px;
-      color: #8e8e93;
-      margin-top: 6px;
-    }
-    .badge-modal-show {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 999;
-      background: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      width: calc(100% - 40px);
-      max-width: 320px;
-    }
-    .badge-modal-show.show {
-      display: block;
-    }
-
-    /* ===== 暗色模式 ===== */
-    body.dark {
-      background: #1a1a2e;
-      color: #e0e0e0;
-    }
-    body.dark #top-bar {
-      background: #2d2d44;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-    }
-    body.dark #top-bar-title { color: #f0f0f0; }
-    body.dark #top-bar-date { color: #999; }
-    body.dark #theme-toggle:hover { background: #3d3d54; }
-    body.dark #bottom-nav {
-      background: #2d2d44;
-      box-shadow: 0 -1px 4px rgba(0,0,0,0.3);
-    }
-    body.dark .nav-item { color: #999; }
-    body.dark .nav-item.active { color: #34c759; }
-    body.dark .goal-card {
-      background: #2d2d44;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    }
-    body.dark .goal-card.checked-in {
-      background: #1a3a2a;
-      border-color: #34c759;
-    }
-    body.dark .goal-title { color: #e0e0e0; }
-    body.dark .goal-streak { color: #999; }
-    body.dark .checkin-btn {
-      background: #2d2d44;
-      border-color: #555;
-    }
-    body.dark .checkin-btn.done { background: #34c759; }
-    body.dark .stat-card { background: #2d2d44; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-    body.dark .stat-card .stat-label { color: #999; }
-    body.dark .stats-section { background: #2d2d44; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-    body.dark .stats-section-title { color: #e0e0e0; }
-    body.dark .bar-fill.zero { background: #444; }
-    body.dark .memo-card { background: #2d2d44; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-    body.dark .memo-card-content { color: #e0e0e0; }
-    body.dark .memo-card-date { color: #999; }
-    body.dark .day-detail { background: #2d2d44; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-    body.dark .day-detail-title { color: #e0e0e0; }
-    body.dark .day-detail-item { border-color: #3d3d54; color: #e0e0e0; }
-    body.dark .calendar-cell { background: #2d2d44; }
-    body.dark .calendar-cell .day-num { color: #e0e0e0; }
-    body.dark .calendar-cell.empty { background: transparent; }
-    body.dark .month-btn { background: #2d2d44; color: #e0e0e0; }
-    body.dark .month-label { color: #e0e0e0; }
-    body.dark .settings-section { background: #2d2d44; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-    body.dark .settings-section-title { color: #e0e0e0; }
-    body.dark .settings-goal-item { border-color: #3d3d54; }
-    body.dark .settings-goal-title { color: #e0e0e0; }
-    body.dark .modal { background: #2d2d44; }
-    body.dark .modal-title { color: #e0e0e0; }
-    body.dark .modal-close { background: #3d3d54; color: #ccc; }
-    body.dark .input-field { background: #1a1a2e; border-color: #3d3d54; color: #e0e0e0; }
-    body.dark .emoji-option { background: #1a1a2e; }
-    body.dark .btn-outline { background: #2d2d44; border-color: #3d3d54; color: #e0e0e0; }
-    body.dark .bar-fill { background: #34c759; }
-    body.dark .badge-item { background: #2d2d44; }
-    body.dark .badge-item.unlocked { background: #3d3520; }
-    body.dark .badge-item .badge-title { color: #e0e0e0; }
-    body.dark .badge-item.locked .badge-title { color: #555; }
-    body.dark .badge-modal-show { background: #2d2d44; }
-    body.dark .badge-modal-show .badge-name { color: #e0e0e0; }
-    body.dark .empty-text { color: #e0e0e0; }
-  </style>
+/* 响应式 */
+@media(max-width:380px){.nav-icon{font-size:18px}.nav-label{font-size:9px}.goal-title{font-size:13px}}
+</style>
 </head>
 <body>
-  <!-- 顶部标题栏 -->
-  <div id="top-bar">
-    <span id="top-bar-title">陈浩南的打卡</span>
+<div id="top-bar">
+  <span id="top-bar-title">陈浩南的打卡</span>
+  <div id="top-bar-right">
     <span id="top-bar-date"></span>
-    <span id="theme-toggle" onclick="toggleTheme()" title="切换暗色模式">🌙</span>
+    <button id="theme-toggle" onclick="toggleTheme()">🌙</button>
   </div>
+</div>
 
-  <!-- 页面1：打卡 -->
-  <div class="page active" id="page-checkin">
-    <!-- 今日进度 -->
-    <div class="today-progress" id="today-progress"></div>
-    <!-- 目标列表 -->
-    <div class="goal-list" id="goal-list"></div>
-    <!-- 空状态引导 -->
-    <div class="empty-state" id="empty-state">
-      <div class="empty-icon">🎯</div>
-      <div class="empty-text">还没有目标哦~</div>
-      <div class="empty-hint">点击下方 + 按钮添加你的第一个目标吧！</div>
-    </div>
+<!-- 打卡页 -->
+<div class="page active" id="page-checkin">
+  <div class="week-summary" id="week-summary"></div>
+  <div class="goal-list" id="goal-list"></div>
+  <div class="empty-state" id="empty-state"><div class="empty-icon">🎯</div><div class="empty-text">还没有目标</div><div class="empty-hint">点击 + 添加第一个目标吧！</div></div>
+</div>
+
+<!-- 统计页 -->
+<div class="page" id="page-stats">
+  <div class="stats-cards" id="stats-cards"></div>
+  <div class="stats-section"><div class="stats-section-title">📊 打卡热力图（近12周）</div><div class="heatmap" id="heatmap"></div></div>
+  <div class="stats-section"><div class="stats-section-title">📈 近7天打卡</div><div class="bar-chart" id="bar-chart"></div></div>
+  <div class="stats-section"><div class="stats-section-title">🏆 成就徽章</div><div class="badge-grid" id="badge-grid"></div></div>
+</div>
+
+<!-- 记录页 -->
+<div class="page" id="page-history">
+  <div class="month-switcher"><button class="month-btn" onclick="prevMonth()">◀</button><span class="month-label" id="month-label"></span><button class="month-btn" onclick="nextMonth()">▶</button></div>
+  <div class="weekday-row"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+  <div class="calendar-grid" id="calendar-grid"></div>
+  <div class="day-detail"><div class="day-detail-title" id="day-detail-title">点击日期查看</div><div id="day-detail-list"></div></div>
+</div>
+
+<!-- 备忘录页 -->
+<div class="page" id="page-memo">
+  <div class="memo-list" id="memo-list"></div>
+  <div class="empty-state" id="memo-empty"><div class="empty-icon">📝</div><div class="empty-text">还没有备忘录</div><div class="empty-hint">点击 + 写下第一条记录</div></div>
+</div>
+
+<!-- 设置页 -->
+<div class="page" id="page-settings">
+  <div class="settings-section"><div class="settings-section-title">📋 目标管理</div><div id="settings-goal-list"></div></div>
+  <div class="settings-section"><div class="settings-section-title">💾 数据管理</div>
+    <button class="btn btn-outline" onclick="exportData()">📥 导出备份</button>
+    <button class="btn btn-outline" style="margin-top:6px" onclick="document.getElementById('import-file').click()">📤 导入备份</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(this)">
+    <button class="btn btn-danger" style="margin-top:14px" onclick="clearAllData()">🗑️ 清除所有数据</button>
   </div>
-
-  <!-- 页面2：记录 -->
-  <div class="page" id="page-history">
-    <!-- 月份切换 -->
-    <div class="month-switcher">
-      <button class="month-btn" onclick="prevMonth()">◀</button>
-      <span class="month-label" id="month-label">2026年5月</span>
-      <button class="month-btn" onclick="nextMonth()">▶</button>
-    </div>
-    <!-- 星期标题 -->
-    <div class="weekday-row">
-      <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
-    </div>
-    <!-- 日历格子 -->
-    <div class="calendar-grid" id="calendar-grid"></div>
-    <!-- 选中日期详情 -->
-    <div class="day-detail" id="day-detail">
-      <div class="day-detail-title" id="day-detail-title">点击日期查看详情</div>
-      <div id="day-detail-list"></div>
-    </div>
+  <div class="settings-section"><div class="settings-section-title">ℹ️ 关于</div>
+    <p style="font-size:12px;color:var(--sub);line-height:1.8">每日打卡 App v3.0<br>由 <strong>陈浩南</strong> 制作<br>数据保存在浏览器本地</p>
   </div>
+</div>
 
-  <!-- 页面3：备忘录 -->
-  <div class="page" id="page-memo">
-    <div class="memo-list" id="memo-list"></div>
-    <div class="empty-state" id="memo-empty">
-      <div class="empty-icon">📝</div>
-      <div class="empty-text">还没有备忘录</div>
-      <div class="empty-hint">点击下方 + 按钮写下你的第一条记录吧！</div>
-    </div>
+<button class="fab" id="fab-add" onclick="openGoalModal()">+</button>
+<button class="fab memo-fab" id="memo-fab" onclick="openMemoModal()" style="display:none;background:var(--blue);box-shadow:0 4px 16px rgba(0,122,255,0.4)">+</button>
+
+<!-- 目标弹窗 -->
+<div class="modal-overlay" id="goal-modal-overlay" onclick="closeGoalModal()"></div>
+<div class="modal" id="goal-modal">
+  <div class="modal-header"><span class="modal-title" id="goal-modal-title">添加目标</span><span class="modal-close" onclick="closeGoalModal()">✕</span></div>
+  <div class="modal-body">
+    <label class="input-label">选择图标</label><div class="emoji-picker" id="emoji-picker"></div>
+    <label class="input-label">目标名称</label><input class="input-field" id="goal-title-input" placeholder="例如：每天运动30分钟" maxlength="20">
+    <label class="input-label">选择颜色</label><div class="color-picker" id="color-picker"></div>
+    <button class="btn btn-primary" onclick="saveGoal()">保存</button>
   </div>
+</div>
 
-  <!-- 备忘录的浮动按钮 -->
-  <button class="fab memo-fab" id="memo-fab" onclick="openMemoModal()" title="新建备忘录" style="display:none;">+</button>
-
-  <!-- 页面4：统计 -->
-  <div class="page" id="page-stats">
-    <!-- 数据概览卡片 -->
-    <div class="stats-cards" id="stats-cards"></div>
-    <!-- 近7天柱状图 -->
-    <div class="stats-section">
-      <div class="stats-section-title">📊 近 7 天打卡情况</div>
-      <div class="bar-chart" id="bar-chart"></div>
-    </div>
-    <!-- 成就展示 -->
-    <div class="stats-section">
-      <div class="stats-section-title">🏆 成就徽章</div>
-      <div class="badge-grid" id="badge-grid"></div>
-    </div>
+<!-- 备忘录弹窗 -->
+<div class="modal-overlay" id="memo-modal-overlay" onclick="closeMemoModal()"></div>
+<div class="modal" id="memo-modal">
+  <div class="modal-header"><span class="modal-title" id="memo-modal-title">新建备忘录</span><span class="modal-close" onclick="closeMemoModal()">✕</span></div>
+  <div class="modal-body">
+    <label class="input-label">日期</label><input class="input-field" id="memo-date-input" type="date">
+    <label class="input-label">内容</label><textarea class="input-field memo-textarea" id="memo-content-input" placeholder="今天想记录什么？" rows="5"></textarea>
+    <button class="btn btn-primary" onclick="saveMemo()">保存</button>
+    <button class="btn btn-danger" id="memo-delete-btn" style="display:none" onclick="deleteCurrentMemo()">删除</button>
   </div>
-
-  <!-- 成就解锁弹窗 -->
-  <div class="modal-overlay" id="badge-modal-overlay" onclick="closeBadgeModal()"></div>
-  <div class="modal badge-modal-show" id="badge-modal">
-    <div class="badge-big" id="badge-big-icon">🏆</div>
-    <div class="badge-name" id="badge-big-name"></div>
-    <div class="badge-desc" id="badge-big-desc"></div>
-    <button class="btn btn-primary" onclick="closeBadgeModal()" style="margin-top:16px;">太棒了！</button>
-  </div>
-
-  <!-- 页面5：设置 -->
-  <div class="page" id="page-settings">
-    <!-- 目标管理 -->
-    <div class="settings-section">
-      <div class="settings-section-title">📋 目标管理</div>
-      <div id="settings-goal-list"></div>
-    </div>
-
-    <!-- 数据管理 -->
-    <div class="settings-section">
-      <div class="settings-section-title">💾 数据管理</div>
-      <button class="btn btn-outline btn-full" onclick="exportData()">📥 导出数据备份</button>
-      <button class="btn btn-outline btn-full" style="margin-top:8px;" onclick="document.getElementById('import-file').click()">📤 导入数据备份</button>
-      <input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleImport(this)">
-      <button class="btn btn-danger btn-full" style="margin-top:16px;" onclick="clearAllData()">🗑️ 清除所有数据</button>
-    </div>
-
-    <!-- 关于 -->
-    <div class="settings-section">
-      <div class="settings-section-title">ℹ️ 关于</div>
-      <p style="font-size:13px;color:#8e8e93;line-height:1.8;">
-        每日打卡 App v2.0<br>
-        由 <strong>陈浩南</strong> 制作<br>
-        数据保存在浏览器本地存储中<br>
-        建议定期导出数据备份，防止丢失
-      </p>
-    </div>
-
-  </div>
-
-  <!-- 添加目标的浮动按钮 -->
-  <button class="fab" id="fab-add" onclick="openGoalModal()" title="添加目标">+</button>
-
-  <!-- 目标编辑弹窗 -->
-  <div class="modal-overlay" id="goal-modal-overlay" onclick="closeGoalModal()"></div>
-  <div class="modal" id="goal-modal">
-    <div class="modal-header">
-      <span class="modal-title" id="goal-modal-title">添加目标</span>
-      <span class="modal-close" onclick="closeGoalModal()">✕</span>
-    </div>
-    <div class="modal-body">
-      <!-- 图标选择 -->
-      <label class="input-label">选择图标</label>
-      <div class="emoji-picker" id="emoji-picker"></div>
-
-      <!-- 目标名称 -->
-      <label class="input-label">目标名称</label>
-      <input class="input-field" id="goal-title-input" type="text" placeholder="例如：每天运动30分钟" maxlength="20">
-
-      <!-- 颜色选择 -->
-      <label class="input-label">选择颜色</label>
-      <div class="color-picker" id="color-picker"></div>
-
-      <!-- 保存按钮 -->
-      <button class="btn btn-primary btn-full" onclick="saveGoal()">保存目标</button>
-    </div>
-  </div>
-
-  <!-- 备忘录编辑弹窗 -->
-  <div class="modal-overlay" id="memo-modal-overlay" onclick="closeMemoModal()"></div>
-  <div class="modal" id="memo-modal">
-    <div class="modal-header">
-      <span class="modal-title" id="memo-modal-title">新建备忘录</span>
-      <span class="modal-close" onclick="closeMemoModal()">✕</span>
-    </div>
-    <div class="modal-body">
-      <label class="input-label">日期</label>
-      <input class="input-field" id="memo-date-input" type="date">
-
-      <label class="input-label">内容</label>
-      <textarea class="input-field memo-textarea" id="memo-content-input" placeholder="今天想记录什么？" rows="6"></textarea>
-
-      <button class="btn btn-primary btn-full" onclick="saveMemo()">保存</button>
-
-      <!-- 删除按钮（编辑时显示） -->
-      <button class="btn btn-danger btn-full" id="memo-delete-btn" style="display:none;" onclick="deleteCurrentMemo()">删除这条备忘录</button>
-    </div>
-  </div>
-
-  <!-- 庆祝动画粒子容器 -->
-  <div id="celebration-container"></div>
-
-  <!-- 底部导航栏 -->
-  <div id="bottom-nav">
-    <div class="nav-item active" data-tab="checkin" onclick="switchTab('checkin')">
-      <span class="nav-icon">✅</span>
-      <span class="nav-label">打卡</span>
-    </div>
-    <div class="nav-item" data-tab="stats" onclick="switchTab('stats')">
-      <span class="nav-icon">📊</span>
-      <span class="nav-label">统计</span>
-    </div>
-    <div class="nav-item" data-tab="history" onclick="switchTab('history')">
-      <span class="nav-icon">📅</span>
-      <span class="nav-label">记录</span>
-    </div>
-    <div class="nav-item" data-tab="memo" onclick="switchTab('memo')">
-      <span class="nav-icon">📝</span>
-      <span class="nav-label">备忘录</span>
-    </div>
-    <div class="nav-item" data-tab="settings" onclick="switchTab('settings')">
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-label">设置</span>
-    </div>
-  </div>
-
-  <script>
-    // ====== 1. 数据中心 —— App 的"大脑" ======
-    var App = {
-      data: {
-        goals: [],      // 所有目标
-        checkins: [],   // 所有打卡记录
-        memos: []       // 所有备忘录
-      }
-    };
-
-    // ====== 2. 工具函数 ======
-
-    // 获取今天的日期字符串，格式: "2026-05-12"
-    function getToday() {
-      var now = new Date();
-      var y = now.getFullYear();
-      var m = String(now.getMonth() + 1).padStart(2, '0');
-      var d = String(now.getDate()).padStart(2, '0');
-      return y + '-' + m + '-' + d;
-    }
-
-    // 生成唯一ID
-    function generateId(prefix) {
-      return (prefix || 'id') + '_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
-    }
-
-    // ====== 3. 数据持久化 —— 存到浏览器的"小本本" ======
-
-    // 从 localStorage 读取数据
-    function loadData() {
-      var raw = localStorage.getItem('habit-tracker-data');
-      if (raw) {
-        try {
-          var parsed = JSON.parse(raw);
-          // 确保数据结构完整
-          App.data.goals = parsed.goals || [];
-          App.data.checkins = parsed.checkins || [];
-          App.data.memos = parsed.memos || [];
-        } catch (e) {
-          // 如果数据坏了，就用空的
-          App.data = { goals: [], checkins: [], memos: [] };
-        }
-      } else {
-        // 第一次使用，给一个空的数据结构
-        App.data = { goals: [], checkins: [], memos: [] };
-      }
-    }
-
-    // 把数据保存到 localStorage
-    function saveData() {
-      var json = JSON.stringify(App.data);
-      localStorage.setItem('habit-tracker-data', json);
-    }
-
-    // ====== 4. 切换底部导航页面 ======
-    function switchTab(tabName) {
-      document.querySelectorAll('.page').forEach(function(p) {
-        p.classList.remove('active');
-      });
-      var page = document.getElementById('page-' + tabName);
-      if (page) {
-        page.classList.add('active');
-      }
-
-      document.querySelectorAll('.nav-item').forEach(function(n) {
-        n.classList.remove('active');
-      });
-      var navItem = document.querySelector('[data-tab="' + tabName + '"]');
-      if (navItem) {
-        navItem.classList.add('active');
-      }
-
-      var titles = {
-        'checkin': '陈浩南的打卡',
-        'stats': '数据统计',
-        'history': '打卡记录',
-        'memo': '备忘录',
-        'settings': '设置'
-      };
-      document.getElementById('top-bar-title').textContent = titles[tabName] || '陈浩南的打卡';
-
-      // 切换到对应页面时刷新内容
-      document.getElementById('fab-add').style.display = (tabName === 'checkin') ? 'flex' : 'none';
-      document.getElementById('memo-fab').style.display = (tabName === 'memo') ? 'flex' : 'none';
-
-      if (tabName === 'checkin') renderCheckinPage();
-      if (tabName === 'stats') renderStatsPage();
-      if (tabName === 'history') { initCalendar(); renderHistoryPage(); }
-      if (tabName === 'memo') renderMemoPage();
-      if (tabName === 'settings') renderSettingsPage();
-    }
-
-    // ====== 5. 显示今天的日期 ======
-    function showTodayDate() {
-      var now = new Date();
-      var weekDays = ['日', '一', '二', '三', '四', '五', '六'];
-      var y = now.getFullYear();
-      var m = now.getMonth() + 1;
-      var d = now.getDate();
-      var w = weekDays[now.getDay()];
-      document.getElementById('top-bar-date').textContent = y + '年' + m + '月' + d + '日 星期' + w;
-    }
-
-    // ====== 6. 预设数据 ======
-    var EMOJI_LIST = ['🏃‍♂️','💪','📚','🎵','🧘','💧','🍎','✍️','🎨','🏋️','💤','🚶','🌿','🧹','🕐','🍽️','🧠','🌅','🏊','🚴'];
-    var COLOR_LIST = [
-      { name: '绿色', value: '#34c759' },
-      { name: '蓝色', value: '#007AFF' },
-      { name: '橙色', value: '#FF9500' },
-      { name: '紫色', value: '#AF52DE' },
-      { name: '粉色', value: '#FF2D55' },
-      { name: '青色', value: '#5AC8FA' },
-      { name: '黄色', value: '#FFCC00' },
-      { name: '灰色', value: '#8E8E93' }
-    ];
-
-    // 当前正在编辑的目标ID（null 表示新建）
-    var editingGoalId = null;
-    // 当前选中的图标和颜色
-    var selectedEmoji = '🏃‍♂️';
-    var selectedColor = '#34c759';
-
-    // ====== 7. 弹窗相关 ======
-
-    // 打开添加目标弹窗
-    function openGoalModal(goalId) {
-      editingGoalId = goalId || null;
-      if (goalId) {
-        // 编辑模式：填充现有数据
-        var goal = App.data.goals.find(function(g) { return g.id === goalId; });
-        if (goal) {
-          selectedEmoji = goal.icon;
-          selectedColor = goal.color;
-          document.getElementById('goal-title-input').value = goal.title;
-          document.getElementById('goal-modal-title').textContent = '编辑目标';
-        }
-      } else {
-        // 新建模式
-        selectedEmoji = '🏃‍♂️';
-        selectedColor = '#34c759';
-        document.getElementById('goal-title-input').value = '';
-        document.getElementById('goal-modal-title').textContent = '添加目标';
-      }
-      renderEmojiPicker();
-      renderColorPicker();
-      document.getElementById('goal-modal-overlay').classList.add('show');
-      document.getElementById('goal-modal').classList.add('show');
-    }
-
-    // 关闭弹窗
-    function closeGoalModal() {
-      document.getElementById('goal-modal-overlay').classList.remove('show');
-      document.getElementById('goal-modal').classList.remove('show');
-      editingGoalId = null;
-      document.getElementById('goal-title-input').value = '';
-    }
-
-    // 渲染图标选择器
-    function renderEmojiPicker() {
-      var html = '';
-      EMOJI_LIST.forEach(function(emoji) {
-        var cls = (emoji === selectedEmoji) ? 'emoji-option selected' : 'emoji-option';
-        html += '<span class="' + cls + '" onclick="selectEmoji(\'' + emoji + '\')">' + emoji + '</span>';
-      });
-      document.getElementById('emoji-picker').innerHTML = html;
-    }
-
-    function selectEmoji(emoji) {
-      selectedEmoji = emoji;
-      renderEmojiPicker();
-    }
-
-    // 渲染颜色选择器
-    function renderColorPicker() {
-      var html = '';
-      COLOR_LIST.forEach(function(c) {
-        var cls = (c.value === selectedColor) ? 'color-option selected' : 'color-option';
-        html += '<span class="' + cls + '" style="background:' + c.value + '" onclick="selectColor(\'' + c.value + '\')" title="' + c.name + '"></span>';
-      });
-      document.getElementById('color-picker').innerHTML = html;
-    }
-
-    function selectColor(color) {
-      selectedColor = color;
-      renderColorPicker();
-    }
-
-    // ====== 8. 目标操作 ======
-
-    // 保存目标（新建或编辑）
-    function saveGoal() {
-      var title = document.getElementById('goal-title-input').value.trim();
-      if (!title) {
-        alert('请输入目标名称');
-        return;
-      }
-
-      if (editingGoalId) {
-        // 编辑已有目标
-        var goal = App.data.goals.find(function(g) { return g.id === editingGoalId; });
-        if (goal) {
-          goal.title = title;
-          goal.icon = selectedEmoji;
-          goal.color = selectedColor;
-        }
-      } else {
-        // 新建目标
-        App.data.goals.push({
-          id: generateId('goal'),
-          title: title,
-          icon: selectedEmoji,
-          color: selectedColor,
-          createdAt: getToday()
-        });
-      }
-
-      saveData();
-      closeGoalModal();
-      renderCheckinPage();
-      checkAchievements();
-    }
-
-    // 删除目标
-    function deleteGoal(goalId) {
-      if (!confirm('确定要删除这个目标吗？相关的打卡记录也会被清除。')) {
-        return;
-      }
-      App.data.goals = App.data.goals.filter(function(g) { return g.id !== goalId; });
-      App.data.checkins = App.data.checkins.filter(function(c) { return c.goalId !== goalId; });
-      saveData();
-      renderCheckinPage();
-    }
-
-    // ====== 9. 打卡操作 ======
-
-    // 判断某个目标今天是否已打卡
-    function isCheckedInToday(goalId) {
-      var today = getToday();
-      return App.data.checkins.some(function(c) {
-        return c.goalId === goalId && c.date === today;
-      });
-    }
-
-    // 获取某个目标的连续打卡天数
-    function getStreak(goalId) {
-      var today = new Date();
-      var count = 0;
-      var checkDate = new Date(today);
-
-      while (true) {
-        var dateStr = checkDate.getFullYear() + '-' +
-          String(checkDate.getMonth() + 1).padStart(2, '0') + '-' +
-          String(checkDate.getDate()).padStart(2, '0');
-
-        var found = App.data.checkins.some(function(c) {
-          return c.goalId === goalId && c.date === dateStr;
-        });
-
-        if (found) {
-          count++;
-          checkDate.setDate(checkDate.getDate() - 1);
-        } else {
-          break;
-        }
-      }
-
-      return count;
-    }
-
-    // 打卡 / 取消打卡
-    function toggleCheckin(goalId, btnElement) {
-      var today = getToday();
-
-      if (isCheckedInToday(goalId)) {
-        // 已经打卡了，取消打卡
-        App.data.checkins = App.data.checkins.filter(function(c) {
-          return !(c.goalId === goalId && c.date === today);
-        });
-        saveData();
-        renderCheckinPage();
-      } else {
-        // 添加打卡记录
-        App.data.checkins.push({
-          goalId: goalId,
-          date: today,
-          timestamp: Date.now()
-        });
-        saveData();
-        // 触发庆祝动画
-        triggerCelebration(btnElement);
-        renderCheckinPage();
-      }
-    }
-
-    // ====== 10. 渲染打卡页面 ======
-    function renderCheckinPage() {
-      var goalList = document.getElementById('goal-list');
-      var emptyState = document.getElementById('empty-state');
-      var progressDiv = document.getElementById('today-progress');
-      var fab = document.getElementById('fab-add');
-      var goals = App.data.goals;
-
-      if (goals.length === 0) {
-        // 没有目标，显示引导
-        goalList.innerHTML = '';
-        emptyState.style.display = 'block';
-        progressDiv.innerHTML = '';
-      } else {
-        emptyState.style.display = 'none';
-
-        // 计算今日进度
-        var checkedCount = 0;
-        goals.forEach(function(g) {
-          if (isCheckedInToday(g.id)) checkedCount++;
-        });
-        progressDiv.innerHTML = '今日打卡 <strong>' + checkedCount + '</strong> / ' + goals.length;
-
-        // 渲染目标卡片
-        var html = '';
-        goals.forEach(function(goal) {
-          var checked = isCheckedInToday(goal.id);
-          var streak = getStreak(goal.id);
-          var cardClass = checked ? 'goal-card checked-in' : 'goal-card';
-          var btnClass = checked ? 'checkin-btn done' : 'checkin-btn';
-          var btnContent = checked ? '✓' : '○';
-
-          html += '<div class="' + cardClass + '" oncontextmenu="event.preventDefault(); deleteGoal(\'' + goal.id + '\')">';
-          html += '  <div class="goal-icon" style="background:' + goal.color + '22; color:' + goal.color + ';">' + goal.icon + '</div>';
-          html += '  <div class="goal-info" onclick="openGoalModal(\'' + goal.id + '\')">';
-          html += '    <div class="goal-title">' + goal.title + '</div>';
-          html += '    <div class="goal-streak">🔥 连续 <strong>' + streak + '</strong> 天</div>';
-          html += '  </div>';
-          html += '  <button class="' + btnClass + '" onclick="event.stopPropagation(); toggleCheckin(\'' + goal.id + '\', this)">' + btnContent + '</button>';
-          html += '</div>';
-        });
-        goalList.innerHTML = html;
-      }
-    }
-
-    // ====== 11. 日历相关 ======
-    var calendarYear, calendarMonth;
-
-    function initCalendar() {
-      var now = new Date();
-      calendarYear = now.getFullYear();
-      calendarMonth = now.getMonth(); // 0-11
-    }
-
-    function prevMonth() {
-      calendarMonth--;
-      if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
-      renderHistoryPage();
-    }
-
-    function nextMonth() {
-      calendarMonth++;
-      if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
-      renderHistoryPage();
-    }
-
-    function renderHistoryPage() {
-      if (!calendarYear) initCalendar();
-
-      // 更新月份标签
-      document.getElementById('month-label').textContent = calendarYear + '年' + (calendarMonth + 1) + '月';
-
-      // 生成日历格子
-      var firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
-      var daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
-      var today = getToday();
-      var totalGoals = App.data.goals.length;
-
-      var html = '';
-
-      // 前面的空白天数
-      for (var i = 0; i < firstDay; i++) {
-        html += '<div class="calendar-cell empty"></div>';
-      }
-
-      // 每个日期的格子
-      for (var day = 1; day <= daysInMonth; day++) {
-        var m = String(calendarMonth + 1).padStart(2, '0');
-        var d = String(day).padStart(2, '0');
-        var dateStr = calendarYear + '-' + m + '-' + d;
-
-        // 计算今天是否标记
-        var isToday = (dateStr === today) ? ' today' : '';
-
-        // 计算打卡状态
-        var checkedCount = App.data.checkins.filter(function(c) { return c.date === dateStr; }).length;
-        var dotClass = 'none';
-        if (checkedCount === totalGoals && totalGoals > 0) dotClass = 'all';
-        else if (checkedCount > 0) dotClass = 'partial';
-
-        html += '<div class="calendar-cell' + isToday + '" data-date="' + dateStr + '" onclick="showDayDetail(\'' + dateStr + '\')">';
-        html += '<span class="day-num">' + day + '</span>';
-        html += '<span class="day-dot ' + dotClass + '"></span>';
-        html += '</div>';
-      }
-
-      document.getElementById('calendar-grid').innerHTML = html;
-
-      // 默认显示今天的详情
-      showDayDetail(today);
-    }
-
-    function showDayDetail(dateStr) {
-      // 移除之前的高亮
-      document.querySelectorAll('.calendar-cell.selected-cell').forEach(function(cell) {
-        cell.classList.remove('selected-cell');
-      });
-
-      // 高亮当前选中的日期
-      var cells = document.querySelectorAll('.calendar-cell');
-      cells.forEach(function(cell) {
-        if (cell.getAttribute('data-date') === dateStr) {
-          cell.classList.add('selected-cell');
-        }
-      });
-
-      var parts = dateStr.split('-');
-      document.getElementById('day-detail-title').textContent = parts[0] + '年' + parseInt(parts[1]) + '月' + parseInt(parts[2]) + '日';
-
-      var dayCheckins = App.data.checkins.filter(function(c) { return c.date === dateStr; });
-      var listDiv = document.getElementById('day-detail-list');
-
-      if (dayCheckins.length === 0) {
-        listDiv.innerHTML = '<div class="day-detail-none">这天没有打卡记录</div>';
-        return;
-      }
-
-      var html = '';
-      dayCheckins.forEach(function(c) {
-        var goal = App.data.goals.find(function(g) { return g.id === c.goalId; });
-        if (goal) {
-          html += '<div class="day-detail-item">';
-          html += '<span class="day-detail-icon" style="background:' + goal.color + '22; color:' + goal.color + ';">' + goal.icon + '</span>';
-          html += '<span>' + goal.title + '</span>';
-          html += '</div>';
-        }
-      });
-      listDiv.innerHTML = html;
-    }
-
-    // ====== 12. 备忘录 ======
-    var editingMemoId = null;
-
-    function renderMemoPage() {
-      var listDiv = document.getElementById('memo-list');
-      var emptyDiv = document.getElementById('memo-empty');
-      var memos = App.data.memos;
-
-      // 按时间倒序排列
-      memos.sort(function(a, b) { return b.createdAt - a.createdAt; });
-
-      if (memos.length === 0) {
-        listDiv.innerHTML = '';
-        emptyDiv.style.display = 'block';
-      } else {
-        emptyDiv.style.display = 'none';
-        var html = '';
-        memos.forEach(function(memo) {
-          html += '<div class="memo-card" onclick="openMemoModal(\'' + memo.id + '\')">';
-          html += '<div class="memo-card-date">📅 ' + memo.date + '</div>';
-          html += '<div class="memo-card-content">' + escapeHtml(memo.content) + '</div>';
-          html += '</div>';
-        });
-        listDiv.innerHTML = html;
-      }
-    }
-
-    function escapeHtml(text) {
-      var div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    function openMemoModal(memoId) {
-      editingMemoId = memoId || null;
-      if (memoId) {
-        var memo = App.data.memos.find(function(m) { return m.id === memoId; });
-        if (memo) {
-          document.getElementById('memo-date-input').value = memo.date;
-          document.getElementById('memo-content-input').value = memo.content;
-          document.getElementById('memo-modal-title').textContent = '编辑备忘录';
-          document.getElementById('memo-delete-btn').style.display = 'block';
-        }
-      } else {
-        document.getElementById('memo-date-input').value = getToday();
-        document.getElementById('memo-content-input').value = '';
-        document.getElementById('memo-modal-title').textContent = '新建备忘录';
-        document.getElementById('memo-delete-btn').style.display = 'none';
-      }
-      document.getElementById('memo-modal-overlay').classList.add('show');
-      document.getElementById('memo-modal').classList.add('show');
-    }
-
-    function closeMemoModal() {
-      document.getElementById('memo-modal-overlay').classList.remove('show');
-      document.getElementById('memo-modal').classList.remove('show');
-      editingMemoId = null;
-    }
-
-    function saveMemo() {
-      var content = document.getElementById('memo-content-input').value.trim();
-      var date = document.getElementById('memo-date-input').value;
-
-      if (!content) {
-        alert('请输入备忘录内容');
-        return;
-      }
-      if (!date) {
-        alert('请选择日期');
-        return;
-      }
-
-      if (editingMemoId) {
-        var memo = App.data.memos.find(function(m) { return m.id === editingMemoId; });
-        if (memo) {
-          memo.content = content;
-          memo.date = date;
-        }
-      } else {
-        App.data.memos.push({
-          id: generateId('memo'),
-          date: date,
-          content: content,
-          createdAt: Date.now()
-        });
-      }
-
-      saveData();
-      closeMemoModal();
-      renderMemoPage();
-      checkAchievements();
-    }
-
-    function deleteCurrentMemo() {
-      if (!editingMemoId) return;
-      if (!confirm('确定要删除这条备忘录吗？')) return;
-
-      App.data.memos = App.data.memos.filter(function(m) { return m.id !== editingMemoId; });
-      saveData();
-      closeMemoModal();
-      renderMemoPage();
-    }
-
-    // ====== 13. 设置页面 ======
-    function renderSettingsPage() {
-      var listDiv = document.getElementById('settings-goal-list');
-      var goals = App.data.goals;
-
-      if (goals.length === 0) {
-        listDiv.innerHTML = '<div style="text-align:center;color:#8e8e93;font-size:13px;padding:12px 0;">还没有目标，去打卡页添加吧！</div>';
-        return;
-      }
-
-      var html = '';
-      goals.forEach(function(goal) {
-        html += '<div class="settings-goal-item">';
-        html += '<span class="settings-goal-icon" style="background:' + goal.color + '22; color:' + goal.color + ';">' + goal.icon + '</span>';
-        html += '<span class="settings-goal-title">' + goal.title + '</span>';
-        html += '<div class="settings-goal-actions">';
-        html += '<button class="btn-sm btn-sm-edit" onclick="openGoalModal(\'' + goal.id + '\')">编辑</button>';
-        html += '<button class="btn-sm btn-sm-delete" onclick="deleteGoalSetting(\'' + goal.id + '\')">删除</button>';
-        html += '</div>';
-        html += '</div>';
-      });
-      listDiv.innerHTML = html;
-    }
-
-    function deleteGoalSetting(goalId) {
-      // 和打卡页的删除一样
-      if (!confirm('确定要删除这个目标吗？相关的打卡记录也会被清除。')) return;
-      App.data.goals = App.data.goals.filter(function(g) { return g.id !== goalId; });
-      App.data.checkins = App.data.checkins.filter(function(c) { return c.goalId !== goalId; });
-      saveData();
-      renderSettingsPage();
-    }
-
-    // 导出数据为 JSON 文件
-    function exportData() {
-      var json = JSON.stringify(App.data, null, 2);
-      var blob = new Blob([json], { type: 'application/json' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = '打卡数据备份_' + getToday() + '.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    // 导入数据
-    function handleImport(input) {
-      var file = input.files[0];
-      if (!file) return;
-
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          var data = JSON.parse(e.target.result);
-          if (data.goals && data.checkins && data.memos) {
-            if (!confirm('导入数据会覆盖当前数据，确定继续吗？')) return;
-            App.data = data;
-            saveData();
-            renderSettingsPage();
-            renderCheckinPage();
-            alert('数据导入成功！');
-          } else {
-            alert('文件格式不正确，请选择之前导出的备份文件。');
-          }
-        } catch (err) {
-          alert('文件读取失败，请确保是 JSON 格式的文件。');
-        }
-      };
-      reader.readAsText(file);
-      // 重置 input，允许再次选择同一文件
-      input.value = '';
-    }
-
-    // 清除所有数据
-    function clearAllData() {
-      if (!confirm('⚠️ 确定要清除所有数据吗？\n\n这将删除所有目标、打卡记录和备忘录。\n建议先导出备份！\n\n确定要继续吗？')) return;
-      if (!confirm('再次确认：真的要清除所有数据吗？此操作不可恢复！')) return;
-
-      App.data = { goals: [], checkins: [], memos: [] };
-      saveData();
-      renderSettingsPage();
-      renderCheckinPage();
-      renderMemoPage();
-      alert('所有数据已清除。');
-    }
-
-    // ====== 14. 音效（用代码生成，不需要音频文件）======
-    var audioCtx = null;
-
-    function playDingSound() {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        var now = audioCtx.currentTime;
-
-        // 叮~ 一声（高频短促）
-        var osc1 = audioCtx.createOscillator();
-        var gain1 = audioCtx.createGain();
-        osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(880, now);
-        osc1.frequency.setValueAtTime(1100, now + 0.08);
-        gain1.gain.setValueAtTime(0.3, now);
-        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        osc1.connect(gain1);
-        gain1.connect(audioCtx.destination);
-        osc1.start(now);
-        osc1.stop(now + 0.3);
-
-        // 咚~ 一声（低频短促，跟在叮后面）
-        var osc2 = audioCtx.createOscillator();
-        var gain2 = audioCtx.createGain();
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(660, now + 0.12);
-        osc2.frequency.setValueAtTime(880, now + 0.2);
-        gain2.gain.setValueAtTime(0.25, now + 0.12);
-        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-        osc2.connect(gain2);
-        gain2.connect(audioCtx.destination);
-        osc2.start(now + 0.12);
-        osc2.stop(now + 0.5);
-      } catch(e) {
-        // 静默处理，不影响功能
-      }
-    }
-
-    // ====== 15. 五彩纸屑烟花 ======
-    function triggerCelebration(btnElement) {
-      // 播放音效
-      playDingSound();
-
-      // 按钮弹跳动画
-      btnElement.classList.add('bounce');
-      setTimeout(function() { btnElement.classList.remove('bounce'); }, 400);
-
-      // 获取按钮在屏幕上的位置
-      var rect = btnElement.getBoundingClientRect();
-      var cx = rect.left + rect.width / 2;
-      var cy = rect.top + rect.height / 2;
-
-      // 彩色纸屑颜色
-      var colors = ['#ff2d55','#ff9500','#ffcc00','#34c759','#5ac8fa','#007aff','#af52de','#ff6b9d','#ffd60a','#30d158'];
-      // 纸屑形状：彩色小方块和圆点
-      var shapes = ['■','●','▲','★','♦','◆'];
-
-      // 发射 40 个纸屑
-      for (var i = 0; i < 40; i++) {
-        var span = document.createElement('span');
-        span.className = 'confetti-piece';
-        span.textContent = shapes[Math.floor(Math.random() * shapes.length)];
-        span.style.color = colors[Math.floor(Math.random() * colors.length)];
-
-        // 随机方向和距离（先向上喷再落下）
-        var angle = (Math.random() - 0.5) * Math.PI;
-        var distance = 40 + Math.random() * 120;
-        var dx = Math.cos(angle) * distance;
-        var dy = -(40 + Math.random() * 120); // 向上喷射
-        var rotation = (Math.random() - 0.5) * 1080;
-        var fallTime = 0.8 + Math.random() * 0.8;
-        var size = 12 + Math.random() * 16;
-
-        span.style.cssText = [
-          'left:' + cx + 'px',
-          'top:' + cy + 'px',
-          '--dx:' + dx + 'px',
-          '--dy:' + dy + 'px',
-          '--rot:' + rotation + 'deg',
-          '--fall-time:' + fallTime + 's',
-          'font-size:' + size + 'px'
-        ].join(';');
-
-        document.getElementById('celebration-container').appendChild(span);
-
-        // 动画结束后清理
-        (function(el, time) {
-          setTimeout(function() { el.remove(); }, time * 1000 + 100);
-        })(span, fallTime);
-      }
-    }
-
-    // ====== 16. 成就系统 ======
-    var BADGES = [
-      { id: 'streak3',  icon: '🥉', name: '初露锋芒', desc: '任意目标连续打卡 3 天', check: function() { return App.data.goals.some(function(g) { return getStreak(g.id) >= 3; }); } },
-      { id: 'streak7',  icon: '🥈', name: '坚持达人', desc: '任意目标连续打卡 7 天', check: function() { return App.data.goals.some(function(g) { return getStreak(g.id) >= 7; }); } },
-      { id: 'streak30', icon: '🥇', name: '自律王者', desc: '任意目标连续打卡 30 天', check: function() { return App.data.goals.some(function(g) { return getStreak(g.id) >= 30; }); } },
-      { id: 'goals3',   icon: '🎯', name: '目标达人', desc: '创建 3 个或以上目标',   check: function() { return App.data.goals.length >= 3; } },
-      { id: 'memos10',  icon: '📝', name: '记录大师', desc: '写了 10 条或以上备忘录', check: function() { return App.data.memos.length >= 10; } },
-      { id: 'fullMonth',icon: '🏆', name: '全勤冠军', desc: '本月每天都完成所有目标', check: function() { return checkFullMonth(); } }
-    ];
-
-    function checkFullMonth() {
-      if (App.data.goals.length === 0) return false;
-      var now = new Date();
-      var y = now.getFullYear();
-      var m = now.getMonth(); // 当月
-      var daysInMonth = new Date(y, m + 1, 0).getDate();
-      var today = now.getDate();
-
-      for (var d = 1; d <= today; d++) {
-        var dateStr = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
-        var checkedCount = App.data.checkins.filter(function(c) { return c.date === dateStr; }).length;
-        if (checkedCount < App.data.goals.length) return false;
-      }
-      return true;
-    }
-
-    function getUnlockedBadges() {
-      if (!App.data.unlockedBadges) App.data.unlockedBadges = [];
-      return App.data.unlockedBadges;
-    }
-
-    function checkAchievements() {
-      var unlocked = getUnlockedBadges();
-      var newBadge = null;
-
-      BADGES.forEach(function(badge) {
-        if (unlocked.indexOf(badge.id) === -1 && badge.check()) {
-          unlocked.push(badge.id);
-          newBadge = badge;
-        }
-      });
-
-      if (newBadge) {
-        App.data.unlockedBadges = unlocked;
-        saveData();
-        showBadgeModal(newBadge);
-      }
-    }
-
-    function showBadgeModal(badge) {
-      document.getElementById('badge-big-icon').textContent = badge.icon;
-      document.getElementById('badge-big-name').textContent = badge.name;
-      document.getElementById('badge-big-desc').textContent = badge.desc;
-      document.getElementById('badge-modal-overlay').classList.add('show');
-      document.getElementById('badge-modal').classList.add('show');
-    }
-
-    function closeBadgeModal() {
-      document.getElementById('badge-modal-overlay').classList.remove('show');
-      document.getElementById('badge-modal').classList.remove('show');
-    }
-
-    // ====== 17. 统计面板 ======
-    function renderStatsPage() {
-      // 计算统计数据
-      var totalCheckins = App.data.checkins.length;
-      var totalGoals = App.data.goals.length;
-
-      // 打卡率：如果有目标，算从第一个目标创建到今天应该打卡的总次数
-      var totalPossible = 0;
-      var totalDone = 0;
-      if (totalGoals > 0) {
-        App.data.goals.forEach(function(g) {
-          var created = new Date(g.createdAt);
-          var today = new Date();
-          var days = Math.floor((today - created) / (1000 * 60 * 60 * 24)) + 1;
-          totalPossible += days;
-        });
-        totalDone = totalCheckins;
-      }
-      var rate = totalPossible > 0 ? Math.round((totalDone / totalPossible) * 100) : 0;
-
-      // 最长连续天数
-      var maxStreak = 0;
-      App.data.goals.forEach(function(g) {
-        var s = getStreak(g.id);
-        if (s > maxStreak) maxStreak = s;
-      });
-
-      // 渲染统计卡片
-      var cardsHtml = '';
-      cardsHtml += '<div class="stat-card"><div class="stat-num">' + totalCheckins + '</div><div class="stat-label">总打卡次数</div></div>';
-      cardsHtml += '<div class="stat-card"><div class="stat-num">' + rate + '%</div><div class="stat-label">整体打卡率</div></div>';
-      cardsHtml += '<div class="stat-card"><div class="stat-num">' + maxStreak + '</div><div class="stat-label">最长连续(天)</div></div>';
-      cardsHtml += '<div class="stat-card"><div class="stat-num">' + App.data.memos.length + '</div><div class="stat-label">备忘录总数</div></div>';
-      document.getElementById('stats-cards').innerHTML = cardsHtml;
-
-      // 渲染近7天柱状图
-      renderBarChart();
-
-      // 渲染成就
-      renderBadgeGrid();
-    }
-
-    function renderBarChart() {
-      var days = [];
-      for (var i = 6; i >= 0; i--) {
-        var d = new Date();
-        d.setDate(d.getDate() - i);
-        var dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-        var count = App.data.checkins.filter(function(c) { return c.date === dateStr; }).length;
-        var label = (d.getMonth() + 1) + '/' + d.getDate();
-        days.push({ label: label, count: count });
-      }
-
-      var maxCount = 0;
-      days.forEach(function(d) { if (d.count > maxCount) maxCount = d.count; });
-
-      var html = '';
-      days.forEach(function(day) {
-        var h = maxCount > 0 ? Math.max(4, (day.count / Math.max(maxCount, 1)) * 100) : 4;
-        var cls = day.count === 0 ? 'bar-fill zero' : 'bar-fill';
-        html += '<div class="bar-col">';
-        html += '<div class="' + cls + '" style="height:' + h + 'px;"></div>';
-        html += '<div class="bar-label">' + day.count + '</div>';
-        html += '<div class="bar-label">' + day.label + '</div>';
-        html += '</div>';
-      });
-      document.getElementById('bar-chart').innerHTML = html;
-    }
-
-    function renderBadgeGrid() {
-      var unlocked = getUnlockedBadges();
-      var html = '';
-      BADGES.forEach(function(badge) {
-        var isUnlocked = unlocked.indexOf(badge.id) !== -1;
-        var cls = isUnlocked ? 'badge-item unlocked' : 'badge-item locked';
-        html += '<div class="' + cls + '">';
-        html += '<div class="badge-icon">' + badge.icon + '</div>';
-        html += '<div class="badge-title">' + badge.name + '</div>';
-        html += '<div class="badge-sub">' + badge.desc + '</div>';
-        html += '</div>';
-      });
-      document.getElementById('badge-grid').innerHTML = html;
-    }
-
-    // ====== 18. 暗色模式切换 ======
-    function toggleTheme() {
-      var body = document.body;
-      var toggle = document.getElementById('theme-toggle');
-      if (body.classList.contains('dark')) {
-        body.classList.remove('dark');
-        toggle.textContent = '🌙';
-        localStorage.setItem('habit-theme', 'light');
-      } else {
-        body.classList.add('dark');
-        toggle.textContent = '☀️';
-        localStorage.setItem('habit-theme', 'dark');
-      }
-    }
-
-    function loadTheme() {
-      var saved = localStorage.getItem('habit-theme');
-      if (saved === 'dark') {
-        document.body.classList.add('dark');
-        document.getElementById('theme-toggle').textContent = '☀️';
-      }
-    }
-
-    // ====== 19. 数据加载更新 ======
-    // 重写 loadData 以支持成就数据
-    var originalLoadData = loadData;
-    loadData = function() {
-      originalLoadData();
-      // 确保 unlockedBadges 存在
-      if (!App.data.unlockedBadges) App.data.unlockedBadges = [];
-    };
-
-    // 打卡后检查成就
-    var originalToggleCheckin = toggleCheckin;
-    toggleCheckin = function(goalId, btnElement) {
-      originalToggleCheckin(goalId, btnElement);
-      // 只在打卡（非取消）时检查成就
-      if (isCheckedInToday(goalId)) {
-        checkAchievements();
-      }
-    };
-
-    // ====== 20. 页面加载时启动 ======
-    function init() {
-      loadData();
-      loadTheme();
-      showTodayDate();
-      initCalendar();
-      renderCheckinPage();
-    }
-
-    init();
-  </script>
+</div>
+
+<!-- 成就弹窗 -->
+<div class="modal-overlay" id="badge-modal-overlay" onclick="closeBadgeModal()"></div>
+<div class="modal" id="badge-modal">
+  <div class="badge-big" id="badge-big-icon">🏆</div>
+  <div class="badge-name" id="badge-big-name"></div>
+  <div class="badge-desc" id="badge-big-desc"></div>
+  <button class="btn btn-primary" onclick="closeBadgeModal()" style="margin-top:14px">太棒了！</button>
+</div>
+
+<div id="celebration-container"></div>
+<div id="toast-container"></div>
+
+<!-- 底部导航 -->
+<div id="bottom-nav">
+  <div class="nav-item active" data-tab="checkin" onclick="switchTab('checkin')"><span class="nav-icon">✅</span><span class="nav-label">打卡</span></div>
+  <div class="nav-item" data-tab="stats" onclick="switchTab('stats')"><span class="nav-icon">📊</span><span class="nav-label">统计</span></div>
+  <div class="nav-item" data-tab="history" onclick="switchTab('history')"><span class="nav-icon">📅</span><span class="nav-label">记录</span></div>
+  <div class="nav-item" data-tab="memo" onclick="switchTab('memo')"><span class="nav-icon">📝</span><span class="nav-label">备忘</span></div>
+  <div class="nav-item" data-tab="settings" onclick="switchTab('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">设置</span></div>
+</div>
+
+<script>
+// ====== 数据核心 ======
+var App={data:{goals:[],checkins:[],memos:[],unlockedBadges:[]}};
+function getToday(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')}
+function generateId(p){return(p||'id')+'_'+Date.now()+'_'+Math.floor(Math.random()*10000)}
+
+function loadData(){var r=localStorage.getItem('habit-tracker-data');if(r){try{var p=JSON.parse(r);App.data.goals=p.goals||[];App.data.checkins=p.checkins||[];App.data.memos=p.memos||[];App.data.unlockedBadges=p.unlockedBadges||[]}catch(e){App.data={goals:[],checkins:[],memos:[],unlockedBadges:[]}}}else App.data={goals:[],checkins:[],memos:[],unlockedBadges:[]}}
+function saveData(){localStorage.setItem('habit-tracker-data',JSON.stringify(App.data))}
+
+// ====== Toast ======
+function showToast(msg){var t=document.createElement('div');t.className='toast';t.textContent=msg;document.getElementById('toast-container').appendChild(t);setTimeout(function(){t.remove()},2200)}
+
+// ====== 主题 ======
+function toggleTheme(){var b=document.body,t=document.getElementById('theme-toggle');if(b.classList.contains('dark')){b.classList.remove('dark');t.textContent='🌙';localStorage.setItem('habit-theme','light')}else{b.classList.add('dark');t.textContent='☀️';localStorage.setItem('habit-theme','dark')}}
+function loadTheme(){var s=localStorage.getItem('habit-theme');if(s==='dark'){document.body.classList.add('dark');document.getElementById('theme-toggle').textContent='☀️'}}
+
+// ====== 页面切换 ======
+function switchTab(tab){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var pg=document.getElementById('page-'+tab);if(pg)pg.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});var ni=document.querySelector('[data-tab="'+tab+'"]');if(ni)ni.classList.add('active');
+  var titles={checkin:'陈浩南的打卡',stats:'数据统计',history:'打卡记录',memo:'备忘录',settings:'设置'};
+  document.getElementById('top-bar-title').textContent=titles[tab]||'陈浩南的打卡';
+  document.getElementById('fab-add').style.display=(tab==='checkin')?'flex':'none';
+  document.getElementById('memo-fab').style.display=(tab==='memo')?'flex':'none';
+  if(tab==='checkin')renderCheckinPage();
+  if(tab==='stats')renderStatsPage();
+  if(tab==='history'){initCalendar();renderHistoryPage()}
+  if(tab==='memo')renderMemoPage();
+  if(tab==='settings')renderSettingsPage()
+}
+
+function showTodayDate(){var n=new Date();var w=['日','一','二','三','四','五','六'];document.getElementById('top-bar-date').textContent=n.getFullYear()+'/'+(n.getMonth()+1)+'/'+n.getDate()+' 周'+w[n.getDay()]}
+
+// ====== 预设 ======
+var EMOJI_LIST=['🏃‍♂️','💪','📚','🎵','🧘','💧','🍎','✍️','🎨','🏋️','💤','🚶','🌿','🧹','🕐','🍽️','🧠','🌅','🏊','🚴'];
+var COLOR_LIST=[{name:'绿色',value:'#34c759'},{name:'蓝色',value:'#007AFF'},{name:'橙色',value:'#FF9500'},{name:'紫色',value:'#AF52DE'},{name:'粉色',value:'#FF2D55'},{name:'青色',value:'#5AC8FA'},{name:'黄色',value:'#FFCC00'},{name:'灰色',value:'#8E8E93'}];
+var editingGoalId=null,selectedEmoji='🏃‍♂️',selectedColor='#34c759',editingMemoId=null;
+
+// ====== 目标弹窗 ======
+function openGoalModal(gid){editingGoalId=gid||null;if(gid){var g=App.data.goals.find(function(x){return x.id===gid});if(g){selectedEmoji=g.icon;selectedColor=g.color;document.getElementById('goal-title-input').value=g.title;document.getElementById('goal-modal-title').textContent='编辑目标'}}else{selectedEmoji='🏃‍♂️';selectedColor='#34c759';document.getElementById('goal-title-input').value='';document.getElementById('goal-modal-title').textContent='添加目标'}renderEmojiPicker();renderColorPicker();document.getElementById('goal-modal-overlay').classList.add('show');document.getElementById('goal-modal').classList.add('show')}
+function closeGoalModal(){document.getElementById('goal-modal-overlay').classList.remove('show');document.getElementById('goal-modal').classList.remove('show');editingGoalId=null}
+function renderEmojiPicker(){var h='';EMOJI_LIST.forEach(function(e){var c=(e===selectedEmoji)?'emoji-option selected':'emoji-option';h+='<span class="'+c+'" onclick="selectEmoji(\''+e+'\')">'+e+'</span>'});document.getElementById('emoji-picker').innerHTML=h}
+function selectEmoji(e){selectedEmoji=e;renderEmojiPicker()}
+function renderColorPicker(){var h='';COLOR_LIST.forEach(function(c){var cls=(c.value===selectedColor)?'color-option selected':'color-option';h+='<span class="'+cls+'" style="background:'+c.value+'" onclick="selectColor(\''+c.value+'\')" title="'+c.name+'"></span>'});document.getElementById('color-picker').innerHTML=h}
+function selectColor(c){selectedColor=c;renderColorPicker()}
+
+function saveGoal(){var t=document.getElementById('goal-title-input').value.trim();if(!t){showToast('请输入目标名称');return}
+  if(editingGoalId){var g=App.data.goals.find(function(x){return x.id===editingGoalId});if(g){g.title=t;g.icon=selectedEmoji;g.color=selectedColor}}else{App.data.goals.push({id:generateId('goal'),title:t,icon:selectedEmoji,color:selectedColor,createdAt:getToday()})}
+  saveData();closeGoalModal();renderCheckinPage();checkAchievements();showToast('目标已保存')}
+function deleteGoal(gid){if(!confirm('确定删除？相关打卡记录也会清除。'))return;App.data.goals=App.data.goals.filter(function(g){return g.id!==gid});App.data.checkins=App.data.checkins.filter(function(c){return c.goalId!==gid});saveData();renderCheckinPage();showToast('已删除')}
+function deleteGoalSetting(gid){deleteGoal(gid);renderSettingsPage()}
+
+// ====== 打卡 ======
+function isCheckedInToday(gid){var t=getToday();return App.data.checkins.some(function(c){return c.goalId===gid&&c.date===t})}
+function getStreak(gid){var today=new Date();var count=0;var cd=new Date(today);while(true){var ds=cd.getFullYear()+'-'+String(cd.getMonth()+1).padStart(2,'0')+'-'+String(cd.getDate()).padStart(2,'0');var found=App.data.checkins.some(function(c){return c.goalId===gid&&c.date===ds});if(found){count++;cd.setDate(cd.getDate()-1)}else break}return count}
+function getLongestStreak(gid){var max=0,cur=0;var dates=App.data.checkins.filter(function(c){return c.goalId===gid}).map(function(c){return c.date}).sort();if(dates.length===0)return 0;
+  var prev=null;dates.forEach(function(d){if(!prev){cur=1}else{var pd=new Date(prev);pd.setDate(pd.getDate()+1);if(d===pd.getFullYear()+'-'+String(pd.getMonth()+1).padStart(2,'0')+'-'+String(pd.getDate()).padStart(2,'0'))cur++;else cur=1}if(cur>max)max=cur;prev=d});return Math.max(max,cur)}
+
+function toggleCheckin(gid,btn){var t=getToday();
+  if(isCheckedInToday(gid)){App.data.checkins=App.data.checkins.filter(function(c){return!(c.goalId===gid&&c.date===t)});saveData();renderCheckinPage()}else{App.data.checkins.push({goalId:gid,date:t,timestamp:Date.now()});saveData();triggerCelebration(btn);renderCheckinPage();checkAchievements()}}
+
+// ====== 打卡页渲染 ======
+function renderCheckinPage(){
+  var goals=App.data.goals,el=document.getElementById('goal-list'),es=document.getElementById('empty-state'),ws=document.getElementById('week-summary');
+  if(goals.length===0){el.innerHTML='';es.style.display='block';ws.innerHTML='';return}
+  es.style.display='none';
+
+  // 本周总结
+  var today=new Date();var weekStart=new Date(today);weekStart.setDate(today.getDate()-today.getDay());var weekDays=[];for(var i=0;i<7;i++){var d=new Date(weekStart);d.setDate(weekStart.getDate()+i);weekDays.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'))}
+  var weekChecked=0,weekTotal=goals.length*7;goals.forEach(function(g){weekDays.forEach(function(d){if(App.data.checkins.some(function(c){return c.goalId===g.id&&c.date===d}))weekChecked++})});
+  var weekRate=weekTotal>0?Math.round(weekChecked/weekTotal*100):0;
+  var circ=2*Math.PI*24;
+  ws.innerHTML='<div class="week-ring"><svg width="56" height="56"><circle cx="28" cy="28" r="24" fill="none" stroke="var(--border)" stroke-width="4"/><circle cx="28" cy="28" r="24" fill="none" stroke="var(--green)" stroke-width="4" stroke-dasharray="'+circ+'" stroke-dashoffset="'+(circ*(1-weekRate/100))+'" stroke-linecap="round"/></svg><div class="ring-text">'+weekRate+'%</div></div><div class="week-info"><div class="week-title">本周打卡率</div><div class="week-detail">完成 '+weekChecked+' / '+weekTotal+' 次 · 共 '+goals.length+' 个目标</div></div>';
+
+  var checkedCount=0;goals.forEach(function(g){if(isCheckedInToday(g.id))checkedCount++});
+  var html='';goals.forEach(function(g){var c=isCheckedInToday(g.id),s=getStreak(g.id),ls=getLongestStreak(g.id);var cardCls=c?'goal-card checked-in':'goal-card';var btnCls=c?'checkin-btn done':'checkin-btn';var barPct=Math.min(100,Math.round(s/30*100));
+    html+='<div class="'+cardCls+'" oncontextmenu="event.preventDefault();deleteGoal(\''+g.id+'\')">';
+    html+='<div class="goal-icon" style="background:'+g.color+'22;color:'+g.color+'">'+g.icon+'</div>';
+    html+='<div class="goal-info" onclick="openGoalModal(\''+g.id+'\')"><div class="goal-title">'+g.title+'</div><div class="goal-streak">🔥 连续 <strong>'+s+'</strong> 天 · 最长 '+ls+' 天</div><div class="goal-bar"><div class="goal-bar-fill" style="width:'+barPct+'%"></div></div></div>';
+    html+='<button class="'+btnCls+'" onclick="event.stopPropagation();toggleCheckin(\''+g.id+'\',this)">'+(c?'✓':'○')+'</button></div>'});el.innerHTML=html}
+
+// ====== 庆祝动画 ======
+function triggerCelebration(btn){playDingSound();btn.classList.add('bounce');setTimeout(function(){btn.classList.remove('bounce')},400);
+  var r=btn.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  var colors=['#ff2d55','#ff9500','#ffcc00','#34c759','#5ac8fa','#007aff','#af52de','#ff6b9d'];var shapes=['■','●','▲','★','♦'];
+  for(var i=0;i<40;i++){var s=document.createElement('span');s.className='confetti-piece';s.textContent=shapes[Math.floor(Math.random()*shapes.length)];s.style.color=colors[Math.floor(Math.random()*colors.length)];
+    var angle=(Math.random()-0.5)*Math.PI,dist=40+Math.random()*120,dx=Math.cos(angle)*dist,dy=-(40+Math.random()*120),rot=(Math.random()-0.5)*1080,ft=0.8+Math.random()*0.8,sz=12+Math.random()*16;
+    s.style.cssText='left:'+cx+'px;top:'+cy+'px;--dx:'+dx+'px;--dy:'+dy+'px;--rot:'+rot+'deg;--fall-time:'+ft+'s;font-size:'+sz+'px';document.getElementById('celebration-container').appendChild(s);
+    (function(el,t){setTimeout(function(){el.remove()},t*1000+100)})(s,ft)}}
+var audioCtx=null;
+function playDingSound(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();var n=audioCtx.currentTime;var o1=audioCtx.createOscillator(),g1=audioCtx.createGain();o1.type='sine';o1.frequency.setValueAtTime(880,n);o1.frequency.setValueAtTime(1100,n+0.08);g1.gain.setValueAtTime(0.3,n);g1.gain.exponentialRampToValueAtTime(0.01,n+0.3);o1.connect(g1);g1.connect(audioCtx.destination);o1.start(n);o1.stop(n+0.3);var o2=audioCtx.createOscillator(),g2=audioCtx.createGain();o2.type='sine';o2.frequency.setValueAtTime(660,n+0.12);o2.frequency.setValueAtTime(880,n+0.2);g2.gain.setValueAtTime(0.25,n+0.12);g2.gain.exponentialRampToValueAtTime(0.01,n+0.5);o2.connect(g2);g2.connect(audioCtx.destination);o2.start(n+0.12);o2.stop(n+0.5)}catch(e){}}
+
+// ====== 热力图 ======
+function renderHeatmap(){
+  var weeks=12,container=document.getElementById('heatmap');var today=new Date();var endDate=new Date(today);endDate.setDate(today.getDate()-today.getDay()+6);
+  var startDate=new Date(endDate);startDate.setDate(startDate.getDate()-weeks*7+1);
+  var checkinMap={};App.data.checkins.forEach(function(c){checkinMap[c.date]=true});
+  var html='';for(var w=0;w<weeks;w++){html+='<div class="heatmap-col">';for(var d=0;d<7;d++){var date=new Date(startDate);date.setDate(startDate.getDate()+w*7+d);var ds=date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');var hasCheckin=checkinMap[ds];var level='';if(hasCheckin){var cnt=App.data.checkins.filter(function(c){return c.date===ds}).length;if(cnt>=4)level=' l4';else if(cnt>=3)level=' l3';else if(cnt>=2)level=' l2';else level=' l1'}html+='<div class="heatmap-cell'+level+'" title="'+ds+'"></div>'}html+='</div>'}
+  container.innerHTML=html}
+
+// ====== 统计页 ======
+var BADGES=[{id:'streak3',icon:'🥉',name:'初露锋芒',desc:'连续打卡3天',check:function(){return App.data.goals.some(function(g){return getStreak(g.id)>=3})}},{id:'streak7',icon:'🥈',name:'坚持达人',desc:'连续打卡7天',check:function(){return App.data.goals.some(function(g){return getStreak(g.id)>=7})}},{id:'streak30',icon:'🥇',name:'自律王者',desc:'连续打卡30天',check:function(){return App.data.goals.some(function(g){return getStreak(g.id)>=30})}},{id:'goals3',icon:'🎯',name:'目标达人',desc:'创建3个以上目标',check:function(){return App.data.goals.length>=3}},{id:'memos10',icon:'📝',name:'记录大师',desc:'写10条以上备忘录',check:function(){return App.data.memos.length>=10}},{id:'fullMonth',icon:'🏆',name:'全勤冠军',desc:'本月全部完成',check:function(){return checkFullMonth()}}];
+function checkFullMonth(){if(App.data.goals.length===0)return false;var n=new Date(),y=n.getFullYear(),m=n.getMonth(),dim=new Date(y,m+1,0).getDate(),td=n.getDate();for(var d=1;d<=td;d++){var ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');if(App.data.checkins.filter(function(c){return c.date===ds}).length<App.data.goals.length)return false}return true}
+function getUnlockedBadges(){if(!App.data.unlockedBadges)App.data.unlockedBadges=[];return App.data.unlockedBadges}
+function checkAchievements(){var u=getUnlockedBadges(),nb=null;BADGES.forEach(function(b){if(u.indexOf(b.id)===-1&&b.check()){u.push(b.id);nb=b}});if(nb){App.data.unlockedBadges=u;saveData();showBadgeModal(nb)}}
+function showBadgeModal(b){document.getElementById('badge-big-icon').textContent=b.icon;document.getElementById('badge-big-name').textContent=b.name;document.getElementById('badge-big-desc').textContent=b.desc;document.getElementById('badge-modal-overlay').classList.add('show');document.getElementById('badge-modal').classList.add('show')}
+function closeBadgeModal(){document.getElementById('badge-modal-overlay').classList.remove('show');document.getElementById('badge-modal').classList.remove('show')}
+
+function renderStatsPage(){
+  var tc=App.data.checkins.length,tg=App.data.goals.length,tp=0,td=0;
+  if(tg>0){App.data.goals.forEach(function(g){var cr=new Date(g.createdAt),n=new Date();var days=Math.floor((n-cr)/(1000*60*60*24))+1;tp+=days});td=tc}
+  var rate=tp>0?Math.round(td/tp*100):0;
+  var ms=0;App.data.goals.forEach(function(g){var s=getStreak(g.id);if(s>ms)ms=s});
+  var msAll=0;App.data.goals.forEach(function(g){var s=getLongestStreak(g.id);if(s>msAll)msAll=s});
+  document.getElementById('stats-cards').innerHTML='<div class="stat-card"><div class="stat-num">'+tc+'</div><div class="stat-label">总打卡次数</div></div><div class="stat-card"><div class="stat-num">'+rate+'%</div><div class="stat-label">整体打卡率</div></div><div class="stat-card"><div class="stat-num">'+msAll+'</div><div class="stat-label">最长连续(天)</div></div><div class="stat-card"><div class="stat-num">'+App.data.memos.length+'</div><div class="stat-label">备忘录</div></div>';
+  renderHeatmap();
+  // 柱状图
+  var days=[];for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);var ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');var cnt=App.data.checkins.filter(function(c){return c.date===ds}).length;days.push({label:(d.getMonth()+1)+'/'+d.getDate(),count:cnt})}
+  var mc=Math.max.apply(null,days.map(function(x){return x.count}));
+  var bh='';days.forEach(function(day){var h=mc>0?Math.max(3,day.count/Math.max(mc,1)*100):3;var cls=day.count===0?'bar-fill zero':'bar-fill';bh+='<div class="bar-col"><div class="'+cls+'" style="height:'+h+'px"></div><div class="bar-label">'+day.count+'</div><div class="bar-label">'+day.label+'</div></div>'});document.getElementById('bar-chart').innerHTML=bh;
+  // 成就
+  var u=getUnlockedBadges(),bhtml='';BADGES.forEach(function(b){var iu=u.indexOf(b.id)!==-1,cls=iu?'badge-item unlocked':'badge-item locked';bhtml+='<div class="'+cls+'"><div class="badge-icon">'+b.icon+'</div><div class="badge-title">'+b.name+'</div><div class="badge-sub">'+b.desc+'</div></div>'});document.getElementById('badge-grid').innerHTML=bhtml}
+
+// ====== 日历 ======
+var calY,calM;
+function initCalendar(){var n=new Date();calY=n.getFullYear();calM=n.getMonth()}
+function prevMonth(){calM--;if(calM<0){calM=11;calY--}renderHistoryPage()}
+function nextMonth(){calM++;if(calM>11){calM=0;calY++}renderHistoryPage()}
+function renderHistoryPage(){if(!calY)initCalendar();document.getElementById('month-label').textContent=calY+'年'+(calM+1)+'月';
+  var fd=new Date(calY,calM,1).getDay(),dim=new Date(calY,calM+1,0).getDate(),today=getToday(),tg=App.data.goals.length,html='';
+  for(var i=0;i<fd;i++)html+='<div class="calendar-cell empty"></div>';
+  for(var day=1;day<=dim;day++){var m2=String(calM+1).padStart(2,'0'),d2=String(day).padStart(2,'0'),ds=calY+'-'+m2+'-'+d2,isT=(ds===today)?' today':'';var cc=App.data.checkins.filter(function(c){return c.date===ds}).length,dot='none';if(cc===tg&&tg>0)dot='all';else if(cc>0)dot='partial';
+    html+='<div class="calendar-cell'+isT+'" data-date="'+ds+'" onclick="showDayDetail(\''+ds+'\')"><span class="day-num">'+day+'</span><span class="day-dot '+dot+'"></span></div>'}
+  document.getElementById('calendar-grid').innerHTML=html;showDayDetail(today)}
+function showDayDetail(ds){document.querySelectorAll('.calendar-cell.selected-cell').forEach(function(c){c.classList.remove('selected-cell')});document.querySelectorAll('.calendar-cell').forEach(function(c){if(c.getAttribute('data-date')===ds)c.classList.add('selected-cell')});
+  var p=ds.split('-');document.getElementById('day-detail-title').textContent=p[0]+'年'+parseInt(p[1])+'月'+parseInt(p[2])+'日';var dc=App.data.checkins.filter(function(c){return c.date===ds}),ld=document.getElementById('day-detail-list');
+  if(dc.length===0){ld.innerHTML='<div class="day-detail-none">这天没有打卡记录</div>';return}
+  var h='';dc.forEach(function(c){var g=App.data.goals.find(function(x){return x.id===c.goalId});if(g)h+='<div class="day-detail-item"><span class="day-detail-icon" style="background:'+g.color+'22;color:'+g.color+'">'+g.icon+'</span><span>'+g.title+'</span></div>'});ld.innerHTML=h}
+
+// ====== 备忘录 ======
+function renderMemoPage(){var ld=document.getElementById('memo-list'),ed=document.getElementById('memo-empty'),ms=App.data.memos;ms.sort(function(a,b){return b.createdAt-a.createdAt});if(ms.length===0){ld.innerHTML='';ed.style.display='block'}else{ed.style.display='none';var h='';ms.forEach(function(m){h+='<div class="memo-card" onclick="openMemoModal(\''+m.id+'\')"><div class="memo-card-date">📅 '+m.date+'</div><div class="memo-card-content">'+escHtml(m.content)+'</div></div>'});ld.innerHTML=h}}
+function openMemoModal(mid){editingMemoId=mid||null;if(mid){var m=App.data.memos.find(function(x){return x.id===mid});if(m){document.getElementById('memo-date-input').value=m.date;document.getElementById('memo-content-input').value=m.content;document.getElementById('memo-modal-title').textContent='编辑备忘录';document.getElementById('memo-delete-btn').style.display='block'}}else{document.getElementById('memo-date-input').value=getToday();document.getElementById('memo-content-input').value='';document.getElementById('memo-modal-title').textContent='新建备忘录';document.getElementById('memo-delete-btn').style.display='none'}document.getElementById('memo-modal-overlay').classList.add('show');document.getElementById('memo-modal').classList.add('show')}
+function closeMemoModal(){document.getElementById('memo-modal-overlay').classList.remove('show');document.getElementById('memo-modal').classList.remove('show');editingMemoId=null}
+function saveMemo(){var c=document.getElementById('memo-content-input').value.trim(),d=document.getElementById('memo-date-input').value;if(!c){showToast('请输入内容');return}if(!d){showToast('请选择日期');return}
+  if(editingMemoId){var m=App.data.memos.find(function(x){return x.id===editingMemoId});if(m){m.content=c;m.date=d}}else{App.data.memos.push({id:generateId('memo'),date:d,content:c,createdAt:Date.now()})}
+  saveData();closeMemoModal();renderMemoPage();checkAchievements();showToast('备忘录已保存')}
+function deleteCurrentMemo(){if(!editingMemoId)return;if(!confirm('确定删除？'))return;App.data.memos=App.data.memos.filter(function(m){return m.id!==editingMemoId});saveData();closeMemoModal();renderMemoPage();showToast('已删除')}
+
+// ====== 设置页 ======
+function renderSettingsPage(){var ld=document.getElementById('settings-goal-list'),gs=App.data.goals;if(gs.length===0){ld.innerHTML='<div style="text-align:center;color:var(--sub);font-size:12px;padding:10px 0">还没有目标</div>';return}
+  var h='';gs.forEach(function(g){h+='<div class="settings-goal-item"><span class="settings-goal-icon" style="background:'+g.color+'22;color:'+g.color+'">'+g.icon+'</span><span class="settings-goal-title">'+g.title+'</span><div class="settings-goal-actions"><button class="btn-sm btn-sm-edit" onclick="openGoalModal(\''+g.id+'\')">编辑</button><button class="btn-sm btn-sm-delete" onclick="deleteGoalSetting(\''+g.id+'\')">删除</button></div></div>'});ld.innerHTML=h}
+function exportData(){var j=JSON.stringify(App.data,null,2),b=new Blob([j],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='打卡备份_'+getToday()+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);showToast('导出成功')}
+function handleImport(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){try{var d=JSON.parse(e.target.result);if(d.goals&&d.checkins&&d.memos){if(!confirm('导入会覆盖当前数据，确定？'))return;App.data=d;App.data.unlockedBadges=App.data.unlockedBadges||[];saveData();renderCheckinPage();renderSettingsPage();showToast('导入成功')}else{showToast('文件格式不正确')}}catch(er){showToast('读取失败')}};r.readAsText(f);inp.value=''}
+function clearAllData(){if(!confirm('⚠️ 确定清除所有数据？\n\n建议先导出备份！'))return;if(!confirm('再次确认：不可恢复！'))return;App.data={goals:[],checkins:[],memos:[],unlockedBadges:[]};saveData();renderCheckinPage();renderMemoPage();renderSettingsPage();showToast('已清除')}
+
+function escHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+// ====== PWA Service Worker ======
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}
+
+// ====== 启动 ======
+function init(){loadData();loadTheme();showTodayDate();initCalendar();renderCheckinPage()}
+init();
+</script>
 </body>
 </html>
